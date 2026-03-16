@@ -3,31 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Anime Kiosk</title>
+    <title>Anime Kiosk</title>
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #000; overflow: hidden; font-family: 'Segoe UI', Roboto, sans-serif; }
-        #container { position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
-        #bg-blur { position: absolute; top: -10%; left: -10%; width: 120%; height: 120%; background-size: cover; background-position: center; filter: blur(45px) brightness(0.35); transition: background-image 1.5s ease-in-out; z-index: 1; }
-        #poster { position: relative; max-width: 85%; max-height: 85%; object-fit: contain; box-shadow: 0 10px 60px rgba(0,0,0,0.9); transition: opacity 1.5s ease-in-out; z-index: 2; border-radius: 4px; }
-        #info-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.95) 70%); color: white; padding: 80px 40px 40px 40px; transition: opacity 1.5s ease-in-out; z-index: 3; }
-        #title { font-size: 2.4rem; font-weight: 800; margin-bottom: 5px; text-shadow: 2px 2px 10px rgba(0,0,0,0.7); }
-        #meta { font-size: 1.2rem; color: #ccc; font-weight: 300; letter-spacing: 1px; }
+        
+        #container { 
+            position: relative; 
+            width: 100%; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: flex-start;
+        }
+
+        #bg-blur { 
+            position: absolute; 
+            top: -5%; left: -5%; width: 110%; height: 110%; 
+            background-size: cover; 
+            background-position: center; 
+            filter: blur(60px) brightness(0.25); 
+            transition: background-image 1.5s ease-in-out; 
+            z-index: 1; 
+        }
+
+        #poster { 
+            position: relative; 
+            height: 95vh; /* Poster now occupies almost the entire vertical space */
+            width: auto;
+            object-fit: contain; 
+            margin-top: 0; 
+            transition: opacity 1.5s ease-in-out; 
+            z-index: 2;
+        }
+
+        #info-overlay { 
+            position: absolute; 
+            bottom: 0; left: 0; right: 0; 
+            /* A tighter gradient focused only at the very bottom */
+            background: linear-gradient(transparent, rgba(0,0,0,0.7) 30%, rgba(0,0,0,0.9) 100%); 
+            color: white; 
+            padding: 40px 20px 10px 20px; 
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center; /* Center text under the poster */
+            transition: opacity 1.5s ease-in-out; 
+            z-index: 3; 
+            pointer-events: none;
+        }
+
+        #title { 
+            font-size: 1.6rem; 
+            font-weight: 700; 
+            margin-bottom: 2px; 
+            text-align: center;
+            text-shadow: 2px 2px 8px rgba(0,0,0,1);
+            max-width: 90%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #meta { 
+            font-size: 0.95rem; 
+            color: #ccc; 
+            text-align: center;
+            text-shadow: 1px 1px 4px rgba(0,0,0,1);
+            margin-bottom: 5px;
+        }
     </style>
 </head>
 <body>
 
-    <div id="container">
+    <div id="container" onclick="fetchDiscoveryAnime()">
         <div id="bg-blur"></div>
         <img id="poster" src="" style="opacity: 0;">
         <div id="info-overlay" style="opacity: 0;">
-            <div id="title">Scanning Database...</div>
-            <div id="meta">Modern Era Filter Active</div>
+            <div id="title">Loading...</div>
+            <div id="meta">Genre Filter Active</div>
         </div>
     </div>
 
     <script>
-        // --- CONFIGURATION ---
-        const PREFERRED_GENRES = [22, 36, 2, 60, 19, 8, 9]; 
+        /* MAL Genre IDs: 22=Romance, 36=Slice of Life, 60=Idols (Female), 19=Music, 9=Ecchi */
+        const PREFERRED_GENRES = [22, 36, 60, 19, 9]; 
         const START_DATE = '2013-01-01';
         const END_DATE = '2026-12-31';
         const REFRESH_RATE = 30000; 
@@ -36,42 +95,33 @@
             const posterImg = document.getElementById('poster');
             const bgBlur = document.getElementById('bg-blur');
             const infoOverlay = document.getElementById('info-overlay');
-            const titleEl = document.getElementById('title');
-            const metaEl = document.getElementById('meta');
             
             try {
                 const randomGenreId = PREFERRED_GENRES[Math.floor(Math.random() * PREFERRED_GENRES.length)];
-                
-                // Construct the URL with Date Range filters
                 const baseUrl = `https://api.jikan.moe/v4/anime?genres=${randomGenreId}&start_date=${START_DATE}&end_date=${END_DATE}&order_by=popularity`;
 
-                // 1. Get total pages for this specific date range and genre
                 const initialRes = await fetch(`${baseUrl}&limit=1`);
                 const initialData = await initialRes.json();
                 
-                // Cap at 15 pages to ensure we get higher-quality/more relevant results 
-                // within the modern era (usually the first few hundred shows)
-                const lastPage = Math.min(initialData.pagination.last_visible_page, 15);
+                const lastPage = Math.min(initialData.pagination.last_visible_page, 20);
                 const randomPage = Math.floor(Math.random() * lastPage) + 1;
 
-                // 2. Fetch the random page
                 const response = await fetch(`${baseUrl}&page=${randomPage}`);
                 const result = await response.json();
                 
                 const anime = result.data[Math.floor(Math.random() * result.data.length)];
                 const imageUrl = anime.images.jpg.large_image_url;
 
-                // Transition
                 posterImg.style.opacity = 0;
                 infoOverlay.style.opacity = 0;
                 
                 setTimeout(() => {
                     bgBlur.style.backgroundImage = `url('${imageUrl}')`;
                     posterImg.src = imageUrl;
-                    titleEl.innerText = anime.title_english || anime.title;
+                    document.getElementById('title').innerText = anime.title_english || anime.title;
                     
                     const genres = anime.genres.slice(0, 3).map(g => g.name).join(', ');
-                    metaEl.innerText = `${genres} | ${anime.aired?.string || 'Released 2015+'}`;
+                    document.getElementById('meta').innerText = `${genres} | ${anime.aired?.string || '2013+'}`;
 
                     posterImg.onload = () => {
                         posterImg.style.opacity = 1;
@@ -80,7 +130,7 @@
                 }, 1500);
 
             } catch (error) {
-                console.error("API Error:", error);
+                console.error("Fetch Error:", error);
                 setTimeout(fetchDiscoveryAnime, 5000);
             }
         }
