@@ -169,18 +169,9 @@
             text-shadow: 1px 1px 2px #000; 
         }
 
-        .stars { 
-            color: #ffc107; 
-            letter-spacing: 2px; 
-        }
-        .score-num { 
-            color: #fff; 
-            font-weight: bold; 
-            margin-left: -5px; 
-        }
-        .year-tag { color: #fff; 
-            font-weight: bold; 
-        }
+        .stars { color: #ffc107; letter-spacing: 2px; }
+        .score-num { color: #fff; font-weight: bold; margin-left: -5px; }
+        .year-tag { color: #fff; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -271,7 +262,7 @@
                 const randomGenreId = PREFERRED_GENRES[Math.floor(Math.random() * PREFERRED_GENRES.length)];
                 
                 // Construct the URL with Date Range filters
-                const baseUrl = `https://api.jikan.moe/v4/anime?genres=${randomGenreId}&start_date=${START_DATE}&end_date=${END_DATE}&order_by=popularity`;
+                const baseUrl = `https://api.jikan.moe/v4/anime?genres=${randomGenreId}&start_date=${START_DATE}&end_date=${END_DATE}&order_by=score`;
 
                 // 1. Get total pages for this specific date range and genre
                 const initialRes = await fetch(`${baseUrl}&limit=1`);
@@ -279,16 +270,24 @@
                 
                 // Cap at 20 pages to ensure we get higher-quality/more relevant results 
                 // within the modern era (usually the first few hundred shows)
-                const lastPage = Math.min(initialData.pagination.last_visible_page, 20);
+                const apiTotalPages = initialData.pagination.last_visible_page || 1;
+                const lastPage = Math.min(apiTotalPages, 20);
                 const randomPage = Math.floor(Math.random() * lastPage) + 1;
 
                 // 2. Fetch the random page
                 const response = await fetch(`${baseUrl}&page=${randomPage}`);
                 const result = await response.json();
                 
+                // === NEW ANTI-BLACK SCREEN GUARD ===
+                // If the data is empty, trigger a retry immediately instead of waiting 60s
+                if (!result.data || result.data.length === 0) {
+                    console.warn("No results found on this page, retrying...");
+                    return fetchDiscoveryAnime(); 
+                }
+
                 const anime = result.data[Math.floor(Math.random() * result.data.length)];
 
-                // Transition
+                // Transition when we have successful data
                 posterImg.style.opacity = 0;
                 infoOverlay.style.opacity = 0;
                 
@@ -319,7 +318,7 @@
 
             } catch (error) {
                 console.error("Fetch Error:", error);
-                // If we hit a rate limit, try again in 5 seconds
+                // If the API fails entirely (rate limit), try again in 5s
                 setTimeout(fetchDiscoveryAnime, 5000);
             }
         }
