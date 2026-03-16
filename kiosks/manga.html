@@ -200,8 +200,8 @@
 
     <script>
         // --- CONFIGURATION ---
-        // MAL Genre IDs: 22=Romance, 36=Slice of Life, 60=Idols (Female), 19=Music, 9=Ecchi
-        const PREFERRED_GENRES = [22, 36, 60, 19, 9];
+        // MAL Genre IDs: 22=Romance, 36=Slice of Life, 4=Comedy, 25=Shoujo
+        const PREFERRED_GENRES = [22, 36, 4, 25];
         const START_DATE = '2013-01-01';
         const REFRESH_RATE = 60000; // Refresh every 60s
 
@@ -272,7 +272,7 @@
                 const randomGenreId = PREFERRED_GENRES[Math.floor(Math.random() * PREFERRED_GENRES.length)];
                 
                 // Construct the URL with Date Range filters
-                const baseUrl = `https://api.jikan.moe/v4/manga?genres=${randomGenreId}&start_date=${START_DATE}&order_by=popularity`;
+                const baseUrl = `https://api.jikan.moe/v4/manga?genres=${randomGenreId}&start_date=${START_DATE}&order_by=popularity&sfw=true`;
 
                 // 1. Get total pages for this specific date range and genre
                 const initialRes = await fetch(`${baseUrl}&limit=1`);
