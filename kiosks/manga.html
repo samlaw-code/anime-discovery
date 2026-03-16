@@ -65,6 +65,32 @@
             z-index: 2; 
         }
 
+        #home-btn {
+            position: absolute; 
+            top: 20px; 
+            left: 20px; 
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.4); 
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            color: rgba(255,255,255,0.6);
+            padding: 10px; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            text-decoration: none;
+            width: 40px; 
+            height: 40px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        #home-btn:hover { 
+            background: rgba(0,0,0,0.8); 
+            color: #fff; 
+            border-color: #ffc107; 
+        }
+
         #freeze-btn {
             position: absolute;
             top: 20px; 
@@ -159,6 +185,7 @@
 
     <div id="container" onclick="handleContainerClick(event)">
         <div id="progress-container"><div id="progress-bar"></div></div>
+        <a href="../index.html" id="home-btn" onclick="event.stopPropagation();">🏠</a>
         <div id="freeze-btn" onclick="toggleFreeze(event)">
             <span id="btn-icon">○</span> <span id="btn-text">Live Mode</span>
         </div>
