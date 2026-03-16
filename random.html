@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Discovery Kiosk</title>
+    <style>
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            background-color: #050505;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        #poster-container {
+            position: relative;
+            width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+        }
+        #poster {
+            max-width: 100%; max-height: 100%;
+            object-fit: contain;
+            transition: opacity 1.5s ease-in-out;
+        }
+        #info-overlay {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            /* Deep gradient for text legibility */
+            background: linear-gradient(transparent, rgba(0,0,0,0.9) 50%);
+            color: white;
+            padding: 60px 30px 30px 30px;
+            transition: opacity 1.5s ease-in-out;
+        }
+        #title { 
+            font-size: 2rem; 
+            font-weight: 800; 
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #meta { 
+            font-size: 1.1rem; 
+            color: #bdc3c7; 
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="poster-container">
+        <img id="poster" src="" style="opacity: 0;">
+        <div id="info-overlay" style="opacity: 0;">
+            <div id="title">Loading Discovery...</div>
+            <div id="meta">Genres • Aired Date</div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchRandomAnime() {
+            const posterImg = document.getElementById('poster');
+            const infoOverlay = document.getElementById('info-overlay');
+            const titleEl = document.getElementById('title');
+            const metaEl = document.getElementById('meta');
+            
+            try {
+                const response = await fetch('https://api.jikan.moe/v4/random/anime');
+                const result = await response.json();
+                const anime = result.data;
+
+                // 1. Title handling
+                const title = anime.title_english || anime.title;
+
+                // 2. Limit to first 3 genres
+                const genres = anime.genres.slice(0, 3).map(g => g.name).join(', ') || 'Anime';
+
+                // 3. Use the 'aired.string' for a readable date (e.g., "Apr 3, 1998")
+                const airedDate = anime.aired?.string || 'Release Date Unknown';
+
+                const imageUrl = anime.images.jpg.large_image_url;
+
+                // Fade out transition
+                posterImg.style.opacity = 0;
+                infoOverlay.style.opacity = 0;
+                
+                setTimeout(() => {
+                    posterImg.src = imageUrl;
+                    titleEl.innerText = title;
+                    metaEl.innerText = `${genres} | ${airedDate}`;
+
+                    posterImg.onload = () => {
+                        posterImg.style.opacity = 1;
+                        infoOverlay.style.opacity = 1;
+                    };
+                }, 1500);
+
+            } catch (error) {
+                console.error("Fetch error:", error);
+                // If we hit a rate limit, try again in 10 seconds
+                setTimeout(fetchRandomAnime, 10000);
+            }
+        }
+
+        // Run on load
+        fetchRandomAnime();
+
+        // Cycle every 30 seconds
+        setInterval(fetchRandomAnime, 30000); 
+    </script>
+</body>
+</html>
