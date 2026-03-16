@@ -29,7 +29,7 @@
 
         #poster { 
             position: relative; 
-            height: 95vh; /* Poster now occupies almost the entire vertical space */
+            height: 95vh; /* Poster occupies almost the entire vertical space */
             width: auto;
             object-fit: contain; 
             margin-top: 0; 
@@ -85,7 +85,8 @@
     </div>
 
     <script>
-        /* MAL Genre IDs: 22=Romance, 36=Slice of Life, 60=Idols (Female), 19=Music, 9=Ecchi */
+        // --- CONFIGURATION ---
+        // MAL Genre IDs: 22=Romance, 36=Slice of Life, 60=Idols (Female), 19=Music, 9=Ecchi
         const PREFERRED_GENRES = [22, 36, 60, 19, 9]; 
         const START_DATE = '2013-01-01';
         const END_DATE = '2026-12-31';
@@ -98,20 +99,27 @@
             
             try {
                 const randomGenreId = PREFERRED_GENRES[Math.floor(Math.random() * PREFERRED_GENRES.length)];
+                
+                // Construct the URL with Date Range filters
                 const baseUrl = `https://api.jikan.moe/v4/anime?genres=${randomGenreId}&start_date=${START_DATE}&end_date=${END_DATE}&order_by=popularity`;
 
+                // 1. Get total pages for this specific date range and genre
                 const initialRes = await fetch(`${baseUrl}&limit=1`);
                 const initialData = await initialRes.json();
                 
+                // Cap at 20 pages to ensure we get higher-quality/more relevant results 
+                // within the modern era (usually the first few hundred shows)
                 const lastPage = Math.min(initialData.pagination.last_visible_page, 20);
                 const randomPage = Math.floor(Math.random() * lastPage) + 1;
 
+                // 2. Fetch the random page
                 const response = await fetch(`${baseUrl}&page=${randomPage}`);
                 const result = await response.json();
                 
                 const anime = result.data[Math.floor(Math.random() * result.data.length)];
                 const imageUrl = anime.images.jpg.large_image_url;
 
+                // Transition
                 posterImg.style.opacity = 0;
                 infoOverlay.style.opacity = 0;
                 
