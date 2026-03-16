@@ -200,8 +200,8 @@
 
     <script>
         // --- CONFIGURATION ---
-        // MAL Genre IDs: 22=Romance, 36=Slice of Life, 4=Comedy, 25=Shoujo
-        const PREFERRED_GENRES = [22, 36, 4, 25];
+        // MAL Genre IDs: 22=Romance, 36=Slice of Life, 25=Shoujo
+        const PREFERRED_GENRES = [22, 36, 25];
         const START_DATE = '2013-01-01';
         const REFRESH_RATE = 60000; // Refresh every 60s
 
@@ -272,15 +272,13 @@
                 const randomGenreId = PREFERRED_GENRES[Math.floor(Math.random() * PREFERRED_GENRES.length)];
                 
                 // Construct the URL with Date Range filters
-                const baseUrl = `https://api.jikan.moe/v4/manga?genres=${randomGenreId}&start_date=${START_DATE}&order_by=popularity&sfw=true`;
+                const baseUrl = `https://api.jikan.moe/v4/manga?genres=${randomGenreId}&start_date=${START_DATE}&order_by=popularity`;
 
                 // 1. Get total pages for this specific date range and genre
                 const initialRes = await fetch(`${baseUrl}&limit=1`);
                 const initialData = await initialRes.json();
 
-                // Cap at 20 pages to ensure we get higher-quality/more relevant results 
-                // within the modern era (usually the first few hundred shows)
-                const lastPage = Math.min(initialData.pagination.last_visible_page, 20);
+                const lastPage = Math.min(initialData.pagination.last_visible_page, initialData.pagination.last_visible_page > 0 ? initialData.pagination.last_visible_page : 1, 20);
                 const randomPage = Math.floor(Math.random() * lastPage) + 1;
 
                 // 2. Fetch the random page
