@@ -262,6 +262,7 @@
                 const randomGenreId = PREFERRED_GENRES[Math.floor(Math.random() * PREFERRED_GENRES.length)];
                 
                 // Construct the URL with Date Range filters
+                // order_by=score ensures the results are sorted by rating rather than popularity (can help find hidden gems)
                 const baseUrl = `https://api.jikan.moe/v4/anime?genres=${randomGenreId}&start_date=${START_DATE}&end_date=${END_DATE}&order_by=score`;
 
                 // 1. Get total pages for this specific date range and genre
