@@ -12,36 +12,37 @@
         }
         
         #container { 
-            position: relative; width: 100%; height: 100vh; 
-            display: flex; flex-direction: column; align-items: center; justify-content: flex-start; 
+            position: relative; width: 100%; height: 100dvh; 
+            display: flex; flex-direction: column; align-items: center; 
+            justify-content: space-between; overflow: hidden;
+            cursor: default;
         }
 
         #bg-blur { 
             position: absolute; top: -5%; left: -5%; width: 110%; height: 110%; 
             background-size: cover; background-position: center; 
-            filter: blur(60px) brightness(0.2); 
+            filter: blur(60px) brightness(0.25); 
             transition: background-image 1.5s ease-in-out; 
             z-index: 1; 
         }
 
-        /* Progress Bar */
-        #progress-container {
-            position: absolute; top: 0; left: 0; width: 100%; height: 4px;
-            background: rgba(255, 255, 255, 0.1); z-index: 20;
+        #progress-container { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 4px; 
+            background: rgba(255, 255, 255, 0.1); z-index: 20; 
         }
-        #progress-bar {
-            height: 100%; width: 0%; background: #ffc107;
-            box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
-            transition: width 0.1s linear;
+        #progress-bar { 
+            height: 100%; width: 0%; background: #ffc107; 
+            box-shadow: 0 0 10px rgba(255, 193, 7, 0.5); 
+            transition: width 0.1s linear; 
         }
 
         #poster { 
-            position: relative; height: 85vh; width: auto; 
-            object-fit: contain; margin-top: 0; 
-            transition: opacity 1.5s ease-in-out; z-index: 2; 
+            position: relative; flex: 1; min-height: 0; 
+            width: auto; max-width: 95%; object-fit: contain; 
+            margin: 15px 0 0 0; transition: opacity 1.5s ease-in-out; 
+            z-index: 2; 
         }
 
-        /* Navigation Buttons */
         .nav-btn {
             position: absolute; top: 20px; z-index: 10;
             background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(5px);
@@ -53,31 +54,37 @@
         .nav-btn:hover { background: rgba(0,0,0,0.8); color: #fff; border-color: #ffc107; }
         
         #home-btn { left: 20px; }
-        #back-btn { left: 75px; display: none; } /* Hidden until first refresh */
+        #back-btn { left: 75px; display: none; } 
+        #next-btn { left: 130px; }
 
         #freeze-btn {
             position: absolute; top: 20px; right: 20px; z-index: 10;
             background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2); color: white; 
-            padding: 10px 15px; border-radius: 30px;
-            cursor: pointer; font-size: 0.75rem; letter-spacing: 1px;
-            text-transform: uppercase; transition: all 0.3s ease;
+            padding: 10px 15px; border-radius: 30px; cursor: pointer; 
+            font-size: 0.75rem; text-transform: uppercase; transition: all 0.3s ease;
             display: flex; align-items: center; gap: 8px;
         }
         #freeze-btn.active { border-color: #ffc107; color: #ffc107; }
 
         #info-overlay { 
-            position: absolute; bottom: 0; left: 0; right: 0; 
-            background: linear-gradient(transparent, rgba(0,0,0,0.98) 25%, rgba(0,0,0,1) 100%); 
-            color: white; padding: 80px 40px 30px 40px; 
-            display: flex; flex-direction: column; justify-content: flex-end; 
-            align-items: center; transition: opacity 1.5s ease-in-out; 
-            z-index: 3; pointer-events: none;
+            position: relative; width: 100%; background: transparent; 
+            color: white; padding: 20px 40px 40px 40px; 
+            display: flex; flex-direction: column; align-items: center; 
+            transition: opacity 1.5s ease-in-out; z-index: 3; 
+            flex-shrink: 0; box-sizing: border-box;
         }
 
-        #title { font-size: 1.7rem; font-weight: 800; margin-bottom: 2px; text-align: center; text-shadow: 2px 2px 8px #000; max-width: 90%; }
-        #meta { font-size: 0.85rem; color: #bbb; text-align: center; margin-bottom: 15px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-        #synopsis { font-size: 0.85rem; line-height: 1.4; max-width: 750px; color: #ddd; text-align: left; display: -webkit-box; -webkit-line-clamp: 10; -webkit-box-orient: vertical; overflow: hidden; text-shadow: 1px 1px 2px #000; }
+        #title { font-size: 1.6rem; font-weight: 800; margin-bottom: 2px; text-align: center; text-shadow: 2px 2px 10px #000; max-width: 95%; }
+        #meta { font-size: 0.8rem; color: #bbb; text-align: center; margin-bottom: 12px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; text-transform: uppercase; }
+        
+        #synopsis { 
+            font-size: 0.85rem; line-height: 1.4; max-width: 800px; 
+            color: #eee; text-align: left; display: -webkit-box; 
+            -webkit-line-clamp: 10; -webkit-box-orient: vertical; 
+            overflow: hidden; text-shadow: 1px 1px 4px #000; 
+            pointer-events: auto;
+        }
 
         .stars { color: #ffc107; letter-spacing: 2px; }
         .status-tag { color: #52ff71; font-weight: bold; }
@@ -85,12 +92,12 @@
     </style>
 </head>
 <body>
-
-    <div id="container" onclick="handleContainerClick(event)">
+    <div id="container">
         <div id="progress-container"><div id="progress-bar"></div></div>
         
-        <a href="../index.html" id="home-btn" class="nav-btn" onclick="event.stopPropagation();">🏠</a>
-        <div id="back-btn" class="nav-btn" onclick="goBack(event)">⬅️</div>
+        <a href="../index.html" id="home-btn" class="nav-btn" title="Home">🏠</a>
+        <div id="back-btn" class="nav-btn" onclick="goBack(event)" title="Previous">⬅️</div>
+        <div id="next-btn" class="nav-btn" onclick="handleNextClick(event)" title="Next">➡️</div>
 
         <div id="freeze-btn" onclick="toggleFreeze(event)">
             <span id="btn-icon">○</span> <span id="btn-text">Live Mode</span>
@@ -107,58 +114,33 @@
     </div>
 
     <script>
-        // --- CONFIGURATION ---
-        const PREFERRED_GENRES = [22, 36, 25]; // Romance, SoL, Shoujo
-        const START_DATE = '2016-01-01';
+        const PREFERRED_GENRES = [22, 36, 25];
+        const START_DATE = '2013-01-01';
         const REFRESH_RATE = 60000; 
 
-        let isFrozen = false;
-        let timeLeft = REFRESH_RATE;
-        let timerUpdate;
+        let isFrozen = false, timeLeft = REFRESH_RATE, timerUpdate;
+        let currentMangaData = null, previousMangaData = null;
 
-        // --- MEMORY FOR "BACK" BUTTON ---
-        let currentMangaData = null;
-        let previousMangaData = null;
-
-        function toggleFreeze(event) {
-            if(event) event.stopPropagation();
+        function toggleFreeze(e) {
+            if(e) e.stopPropagation();
             isFrozen = !isFrozen;
             const btn = document.getElementById('freeze-btn');
-            const icon = document.getElementById('btn-icon');
-            const text = document.getElementById('btn-text');
-
-            if (isFrozen) {
-                btn.classList.add('active');
-                icon.innerText = '●';
-                text.innerText = 'Frozen';
-                stopTimer();
-            } else {
-                btn.classList.remove('active');
-                icon.innerText = '○';
-                text.innerText = 'Live Mode';
-                startTimer();
-            }
+            document.getElementById('btn-icon').innerText = isFrozen ? '●' : '○';
+            document.getElementById('btn-text').innerText = isFrozen ? 'Frozen' : 'Live Mode';
+            isFrozen ? (btn.classList.add('active'), stopTimer()) : (btn.classList.remove('active'), startTimer());
         }
 
-        function handleContainerClick(event) {
-            if (!isFrozen) {
-                timeLeft = REFRESH_RATE;
-                fetchDiscoveryManga();
-            }
+        function handleNextClick(e) {
+            if(e) e.stopPropagation();
+            timeLeft = REFRESH_RATE;
+            fetchDiscoveryManga();
         }
 
-        function goBack(event) {
-            event.stopPropagation();
+        function goBack(e) {
+            if(e) e.stopPropagation();
             if (!previousMangaData) return;
-
-            // Auto-freeze when going back so user can actually read it
             if (!isFrozen) toggleFreeze();
-
-            // Swap them so you can toggle back and forth
-            const temp = currentMangaData;
-            currentMangaData = previousMangaData;
-            previousMangaData = temp;
-
+            [currentMangaData, previousMangaData] = [previousMangaData, currentMangaData];
             displayManga(currentMangaData);
         }
 
@@ -167,98 +149,49 @@
             timerUpdate = setInterval(() => {
                 if (!isFrozen) {
                     timeLeft -= 100;
-                    const progress = ((REFRESH_RATE - timeLeft) / REFRESH_RATE) * 100;
-                    document.getElementById('progress-bar').style.width = progress + '%';
-                    if (timeLeft <= 0) {
-                        timeLeft = REFRESH_RATE;
-                        fetchDiscoveryManga();
-                    }
+                    document.getElementById('progress-bar').style.width = ((REFRESH_RATE - timeLeft) / REFRESH_RATE) * 100 + '%';
+                    if (timeLeft <= 0) { timeLeft = REFRESH_RATE; fetchDiscoveryManga(); }
                 }
             }, 100);
         }
-
         function stopTimer() { clearInterval(timerUpdate); }
-
-        function getStarRating(score) {
-            if (!score) return "Unrated";
-            const starCount = Math.round(score / 2);
-            return "★".repeat(starCount) + "☆".repeat(5 - starCount);
-        }
 
         async function fetchDiscoveryManga() {
             try {
-                const randomGenreId = PREFERRED_GENRES[Math.floor(Math.random() * PREFERRED_GENRES.length)];
-                const baseUrl = `https://api.jikan.moe/v4/manga?genres=${randomGenreId}&start_date=${START_DATE}&order_by=popularity`;
-
-                const initialRes = await fetch(`${baseUrl}&limit=1`);
-                const initialData = await initialRes.json();
-
-                const apiTotalPages = initialData.pagination.last_visible_page || 1;
-                const lastPage = Math.min(apiTotalPages, 20);
-                const randomPage = Math.floor(Math.random() * lastPage) + 1;
-
-                const response = await fetch(`${baseUrl}&page=${randomPage}`);
-                const result = await response.json();
+                const genre = PREFERRED_GENRES[Math.floor(Math.random() * PREFERRED_GENRES.length)];
+                const baseUrl = `https://api.jikan.moe/v4/manga?genres=${genre}&start_date=${START_DATE}&order_by=popularity`;
+                const init = await (await fetch(`${baseUrl}&limit=1`)).json();
+                const page = Math.floor(Math.random() * Math.min(init.pagination.last_visible_page || 1, 20)) + 1;
+                const res = await (await fetch(`${baseUrl}&page=${page}`)).json();
                 
-                // ANTI-BLACK SCREEN GUARD
-                if (!result.data || result.data.length === 0) {
-                    return fetchDiscoveryManga(); 
-                }
+                if (!res.data?.length) return fetchDiscoveryManga();
+                const newManga = res.data[Math.floor(Math.random() * res.data.length)];
 
-                const newManga = result.data[Math.floor(Math.random() * result.data.length)];
-
-                // Update Memory
                 if (currentMangaData) {
                     previousMangaData = currentMangaData;
                     document.getElementById('back-btn').style.display = 'flex';
                 }
                 currentMangaData = newManga;
-
                 displayManga(currentMangaData);
-
-            } catch (error) {
-                console.error("Fetch Error:", error);
-                setTimeout(fetchDiscoveryManga, 5000);
-            }
+            } catch (e) { setTimeout(fetchDiscoveryManga, 5000); }
         }
 
-        function displayManga(manga) {
-            const posterImg = document.getElementById('poster');
-            const bgBlur = document.getElementById('bg-blur');
-            const infoOverlay = document.getElementById('info-overlay');
-
-            posterImg.style.opacity = 0;
-            infoOverlay.style.opacity = 0;
-            
+        function displayManga(m) {
+            const p = document.getElementById('poster'), b = document.getElementById('bg-blur'), o = document.getElementById('info-overlay');
+            p.style.opacity = o.style.opacity = 0;
             setTimeout(() => {
-                const imageUrl = manga.images.jpg.large_image_url;
-                bgBlur.style.backgroundImage = `url('${imageUrl}')`;
-                posterImg.src = imageUrl;
-                
-                document.getElementById('title').innerText = manga.title_english || manga.title;
-                const stars = getStarRating(manga.score);
-                const status = manga.status || 'Unknown';
-                const year = manga.published?.prop?.from?.year || '????';
-                const genres = manga.genres.slice(0, 2).map(g => g.name).join(', ');
-                const counts = `${manga.chapters || '?'} Ch / ${manga.volumes || '?'} Vol`;
-                
-                document.getElementById('meta').innerHTML = `
-                    <span class="stars">${stars}</span> | 
-                    <span class="status-tag">${status}</span> | 
-                    <span class="year-tag">${year}</span> | 
-                    ${genres} | ${counts}`;
-                
-                document.getElementById('synopsis').innerText = manga.synopsis || "No synopsis available.";
-
-                posterImg.onload = () => {
-                    posterImg.style.opacity = 1;
-                    infoOverlay.style.opacity = 1;
-                };
+                const img = m.images.jpg.large_image_url;
+                b.style.backgroundImage = `url('${img}')`;
+                p.src = img;
+                document.getElementById('title').innerText = m.title_english || m.title;
+                const stars = m.score ? "★".repeat(Math.round(m.score/2)) + "☆".repeat(5-Math.round(m.score/2)) : "Unrated";
+                document.getElementById('meta').innerHTML = `<span class="stars">${stars}</span> | <span class="status-tag">${m.status || '?'}</span> | <span class="year-tag">${m.published?.prop?.from?.year || '????'}</span> | ${m.genres.slice(0,2).map(g=>g.name).join(', ')} | ${m.chapters||'?'} Ch`;
+                document.getElementById('synopsis').innerText = m.synopsis || "No synopsis available.";
+                p.onload = () => { p.style.opacity = o.style.opacity = 1; };
             }, 1500);
         }
 
-        fetchDiscoveryManga();
-        startTimer();
+        fetchDiscoveryManga(); startTimer();
     </script>
 </body>
 </html>
