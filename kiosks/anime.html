@@ -15,7 +15,7 @@
             position: relative; width: 100%; height: 100dvh; 
             display: flex; flex-direction: column; align-items: center; 
             justify-content: space-between; overflow: hidden;
-            cursor: default; /* No longer a giant button */
+            cursor: default;
         }
 
         #bg-blur { 
@@ -43,30 +43,27 @@
             z-index: 2; 
         }
 
-        /* Navigation Button Row */
+        /* Unified Navigation Button Style */
         .nav-btn {
             position: absolute; top: 20px; z-index: 10;
             background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(5px);
             border: 1px solid rgba(255, 255, 255, 0.1); color: rgba(255,255,255,0.6);
-            padding: 10px; border-radius: 50%; cursor: pointer; text-decoration: none;
-            width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
-            transition: all 0.3s ease;
+            width: 42px; height: 42px; border-radius: 50%; 
+            cursor: pointer; text-decoration: none;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s ease; font-size: 1.1rem;
         }
         .nav-btn:hover { background: rgba(0,0,0,0.8); color: #fff; border-color: #ffc107; }
         
         #home-btn { left: 20px; }
-        #back-btn { left: 75px; display: none; } 
-        #next-btn { left: 130px; } /* Positioned for easy access */
+        #back-btn { left: 77px; display: none; } 
+        #next-btn { left: 134px; }
+        #freeze-btn { right: 20px; } /* Positioned on the opposite side */
 
-        #freeze-btn {
-            position: absolute; top: 20px; right: 20px; z-index: 10;
-            background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2); color: white; 
-            padding: 10px 15px; border-radius: 30px; cursor: pointer; 
-            font-size: 0.75rem; text-transform: uppercase; transition: all 0.3s ease;
-            display: flex; align-items: center; gap: 8px;
+        #freeze-btn.active { 
+            border-color: #ffc107; color: #ffc107; 
+            background: rgba(255, 193, 7, 0.15); 
         }
-        #freeze-btn.active { border-color: #ffc107; color: #ffc107; }
 
         #info-overlay { 
             position: relative; width: 100%; background: transparent; 
@@ -84,11 +81,10 @@
             color: #eee; text-align: left; display: -webkit-box; 
             -webkit-line-clamp: 10; -webkit-box-orient: vertical; 
             overflow: hidden; text-shadow: 1px 1px 4px #000; 
-            pointer-events: auto; /* Allows you to highlight text */
+            pointer-events: auto;
         }
 
         .stars { color: #ffc107; letter-spacing: 2px; }
-        .score-num { color: #fff; font-weight: bold; margin-left: -5px; }
         .year-tag { color: #fff; font-weight: bold; }
         .ep-tag { color: #ffc107; font-weight: bold; }
     </style>
@@ -101,8 +97,8 @@
         <div id="back-btn" class="nav-btn" onclick="goBack(event)" title="Previous">⬅️</div>
         <div id="next-btn" class="nav-btn" onclick="handleNextClick(event)" title="Next">➡️</div>
 
-        <div id="freeze-btn" onclick="toggleFreeze(event)">
-            <span id="btn-icon">○</span> <span id="btn-text">Live Mode</span>
+        <div id="freeze-btn" class="nav-btn" onclick="toggleFreeze(event)" title="Play/Pause Rotation">
+            <span id="btn-icon">⏸</span>
         </div>
 
         <div id="bg-blur"></div>
@@ -128,14 +124,22 @@
             if(e) e.stopPropagation();
             isFrozen = !isFrozen;
             const btn = document.getElementById('freeze-btn');
-            document.getElementById('btn-icon').innerText = isFrozen ? '●' : '○';
-            document.getElementById('btn-text').innerText = isFrozen ? 'Frozen' : 'Live Mode';
-            isFrozen ? (btn.classList.add('active'), stopTimer()) : (btn.classList.remove('active'), startTimer());
+            const icon = document.getElementById('btn-icon');
+
+            if (isFrozen) {
+                btn.classList.add('active');
+                icon.innerText = '▶'; // Show play icon when paused
+                stopTimer();
+            } else {
+                btn.classList.remove('active');
+                icon.innerText = '⏸'; // Show pause icon when running
+                startTimer();
+            }
         }
 
         function handleNextClick(e) {
             if(e) e.stopPropagation();
-            timeLeft = REFRESH_RATE; // Reset timer on manual skip
+            timeLeft = REFRESH_RATE;
             fetchDiscoveryAnime();
         }
 
@@ -158,12 +162,6 @@
             }, 100);
         }
         function stopTimer() { clearInterval(timerUpdate); }
-
-        function getStarRating(score) {
-            if (!score) return "Unrated";
-            const starCount = Math.round(score / 2);
-            return "★".repeat(starCount) + "☆".repeat(5 - starCount);
-        }
 
         async function fetchDiscoveryAnime() {
             try {
@@ -193,7 +191,7 @@
                 b.style.backgroundImage = `url('${img}')`;
                 p.src = img;
                 document.getElementById('title').innerText = a.title_english || a.title;
-                const stars = getStarRating(a.score);
+                const stars = a.score ? "★".repeat(Math.round(a.score/2)) + "☆".repeat(5-Math.round(a.score/2)) : "Unrated";
                 document.getElementById('meta').innerHTML = `<span class="stars">${stars}</span> (${a.score?.toFixed(1) || '?'}) | <span class="year-tag">${a.aired?.prop?.from?.year || '????'}</span> | <span class="ep-tag">${a.episodes || '?'} EPS</span> | ${a.genres.slice(0,2).map(g=>g.name).join(', ')} | ${a.type || 'TV'}`;
                 document.getElementById('synopsis').innerText = a.synopsis || "No synopsis available.";
                 p.onload = () => { p.style.opacity = o.style.opacity = 1; };
