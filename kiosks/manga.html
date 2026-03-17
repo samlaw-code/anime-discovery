@@ -43,9 +43,9 @@
             z-index: 2; 
         }
 
-        /* Unified Navigation Button Style */
+        /* VERTICAL NAVIGATION */
         .nav-btn {
-            position: absolute; top: 20px; z-index: 10;
+            position: absolute; left: 20px; z-index: 10;
             background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(5px);
             border: 1px solid rgba(255, 255, 255, 0.1); color: rgba(255,255,255,0.6);
             width: 42px; height: 42px; border-radius: 50%; 
@@ -55,10 +55,10 @@
         }
         .nav-btn:hover { background: rgba(0,0,0,0.8); color: #fff; border-color: #ffc107; }
         
-        #home-btn { left: 20px; }
-        #back-btn { left: 77px; display: none; } 
-        #next-btn { left: 134px; }
-        #freeze-btn { right: 20px; } 
+        #home-btn { top: 20px; }
+        #back-btn { top: 72px; display: none; } 
+        #next-btn { top: 124px; }
+        #freeze-btn { top: 20px; right: 20px; left: auto; } 
 
         #freeze-btn.active { 
             border-color: #ffc107; color: #ffc107; 
@@ -73,7 +73,7 @@
             flex-shrink: 0; box-sizing: border-box;
         }
 
-        #title { font-size: 1.6rem; font-weight: 800; margin-bottom: 2px; text-align: center; text-shadow: 2px 2px 10px #000; max-width: 95%; }
+        #title { font-size: 1.6rem; font-weight: 800; margin-bottom: 2px; text-align: center; text-shadow: 2px 2px 10px #000; max-width: 90%; }
         #meta { font-size: 0.8rem; color: #bbb; text-align: center; margin-bottom: 12px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; text-transform: uppercase; }
         
         #synopsis { 
@@ -97,7 +97,7 @@
         <div id="back-btn" class="nav-btn" onclick="goBack(event)" title="Previous">⬅️</div>
         <div id="next-btn" class="nav-btn" onclick="handleNextClick(event)" title="Next">➡️</div>
 
-        <div id="freeze-btn" class="nav-btn" onclick="toggleFreeze(event)" title="Play/Pause Rotation">
+        <div id="freeze-btn" class="nav-btn" onclick="toggleFreeze(event)" title="Play/Pause">
             <span id="btn-icon">⏸</span>
         </div>
 
@@ -124,14 +124,13 @@
             isFrozen = !isFrozen;
             const btn = document.getElementById('freeze-btn');
             const icon = document.getElementById('btn-icon');
-
             if (isFrozen) {
                 btn.classList.add('active');
-                icon.innerText = '▶'; 
+                icon.innerText = '▶';
                 stopTimer();
             } else {
                 btn.classList.remove('active');
-                icon.innerText = '⏸'; 
+                icon.innerText = '⏸';
                 startTimer();
             }
         }
