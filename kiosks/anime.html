@@ -12,19 +12,20 @@
         }
         
         #container { 
-            position: relative; width: 100%; height: 100vh; 
-            display: flex; flex-direction: column; align-items: center; justify-content: flex-start; 
+            position: relative; width: 100%; height: 100dvh; 
+            display: flex; flex-direction: column; align-items: center; 
+            justify-content: space-between; overflow: hidden;
+            cursor: default; /* No longer a giant button */
         }
 
         #bg-blur { 
             position: absolute; top: -5%; left: -5%; width: 110%; height: 110%; 
             background-size: cover; background-position: center; 
-            filter: blur(60px) brightness(0.2); 
+            filter: blur(60px) brightness(0.25); 
             transition: background-image 1.5s ease-in-out; 
             z-index: 1; 
         }
 
-        /* Progress Bar */
         #progress-container { 
             position: absolute; top: 0; left: 0; width: 100%; height: 4px; 
             background: rgba(255, 255, 255, 0.1); z-index: 20; 
@@ -36,12 +37,13 @@
         }
 
         #poster { 
-            position: relative; height: 85vh; width: auto; 
-            object-fit: contain; margin-top: 0; 
-            transition: opacity 1.5s ease-in-out; z-index: 2; 
+            position: relative; flex: 1; min-height: 0; 
+            width: auto; max-width: 95%; object-fit: contain; 
+            margin: 15px 0 0 0; transition: opacity 1.5s ease-in-out; 
+            z-index: 2; 
         }
 
-        /* Navigation Buttons */
+        /* Navigation Button Row */
         .nav-btn {
             position: absolute; top: 20px; z-index: 10;
             background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(5px);
@@ -54,30 +56,36 @@
         
         #home-btn { left: 20px; }
         #back-btn { left: 75px; display: none; } 
+        #next-btn { left: 130px; } /* Positioned for easy access */
 
         #freeze-btn {
             position: absolute; top: 20px; right: 20px; z-index: 10;
             background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2); color: white; 
-            padding: 10px 15px; border-radius: 30px;
-            cursor: pointer; font-size: 0.75rem; letter-spacing: 1px; 
-            text-transform: uppercase; transition: all 0.3s ease;
+            padding: 10px 15px; border-radius: 30px; cursor: pointer; 
+            font-size: 0.75rem; text-transform: uppercase; transition: all 0.3s ease;
             display: flex; align-items: center; gap: 8px;
         }
         #freeze-btn.active { border-color: #ffc107; color: #ffc107; }
 
         #info-overlay { 
-            position: absolute; bottom: 0; left: 0; right: 0; 
-            background: linear-gradient(transparent, rgba(0,0,0,0.98) 25%, rgba(0,0,0,1) 100%); 
-            color: white; padding: 80px 40px 30px 40px; 
-            display: flex; flex-direction: column; justify-content: flex-end; 
-            align-items: center; transition: opacity 1.5s ease-in-out; 
-            z-index: 3; pointer-events: none;
+            position: relative; width: 100%; background: transparent; 
+            color: white; padding: 20px 40px 40px 40px; 
+            display: flex; flex-direction: column; align-items: center; 
+            transition: opacity 1.5s ease-in-out; z-index: 3; 
+            flex-shrink: 0; box-sizing: border-box;
         }
 
-        #title { font-size: 1.7rem; font-weight: 800; margin-bottom: 2px; text-align: center; text-shadow: 2px 2px 8px #000; max-width: 90%; }
-        #meta { font-size: 0.85rem; color: #bbb; text-align: center; margin-bottom: 15px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-        #synopsis { font-size: 0.85rem; line-height: 1.4; max-width: 750px; color: #ddd; text-align: left; display: -webkit-box; -webkit-line-clamp: 10; -webkit-box-orient: vertical; overflow: hidden; text-shadow: 1px 1px 2px #000; }
+        #title { font-size: 1.6rem; font-weight: 800; margin-bottom: 2px; text-align: center; text-shadow: 2px 2px 10px #000; max-width: 95%; }
+        #meta { font-size: 0.8rem; color: #bbb; text-align: center; margin-bottom: 12px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; text-transform: uppercase; }
+        
+        #synopsis { 
+            font-size: 0.85rem; line-height: 1.4; max-width: 800px; 
+            color: #eee; text-align: left; display: -webkit-box; 
+            -webkit-line-clamp: 10; -webkit-box-orient: vertical; 
+            overflow: hidden; text-shadow: 1px 1px 4px #000; 
+            pointer-events: auto; /* Allows you to highlight text */
+        }
 
         .stars { color: #ffc107; letter-spacing: 2px; }
         .score-num { color: #fff; font-weight: bold; margin-left: -5px; }
@@ -86,12 +94,12 @@
     </style>
 </head>
 <body>
-
-    <div id="container" onclick="handleContainerClick(event)">
+    <div id="container">
         <div id="progress-container"><div id="progress-bar"></div></div>
         
-        <a href="../index.html" id="home-btn" class="nav-btn" onclick="event.stopPropagation();">🏠</a>
-        <div id="back-btn" class="nav-btn" onclick="goBack(event)">⬅️</div>
+        <a href="../index.html" id="home-btn" class="nav-btn" title="Home">🏠</a>
+        <div id="back-btn" class="nav-btn" onclick="goBack(event)" title="Previous">⬅️</div>
+        <div id="next-btn" class="nav-btn" onclick="handleNextClick(event)" title="Next">➡️</div>
 
         <div id="freeze-btn" onclick="toggleFreeze(event)">
             <span id="btn-icon">○</span> <span id="btn-text">Live Mode</span>
@@ -101,61 +109,41 @@
         <img id="poster" src="" style="opacity: 0;">
         
         <div id="info-overlay" style="opacity: 0;">
-            <div id="title">Scanning Library...</div>
+            <div id="title">Scanning...</div>
             <div id="meta">...</div>
             <div id="synopsis">...</div>
         </div>
     </div>
 
     <script>
-        // --- CONFIGURATION ---
-        // MAL Genre IDs: 22=Romance, 36=Slice of Life, 60=Idols (Female), 19=Music, 9=Ecchi
         const PREFERRED_GENRES = [22, 36, 60, 19, 9]; 
         const START_DATE = '2013-01-01';
         const END_DATE = '2026-12-31';
-        const REFRESH_RATE = 60000; // Refresh every 60s
+        const REFRESH_RATE = 60000; 
 
-        let isFrozen = false;
-        let timeLeft = REFRESH_RATE;
-        let timerUpdate;
+        let isFrozen = false, timeLeft = REFRESH_RATE, timerUpdate;
+        let currentAnimeData = null, previousAnimeData = null;
 
-        let currentAnimeData = null;
-        let previousAnimeData = null;
-
-        function toggleFreeze(event) {
-            if(event) event.stopPropagation();
+        function toggleFreeze(e) {
+            if(e) e.stopPropagation();
             isFrozen = !isFrozen;
             const btn = document.getElementById('freeze-btn');
-            const icon = document.getElementById('btn-icon');
-            const text = document.getElementById('btn-text');
-
-            if (isFrozen) {
-                btn.classList.add('active');
-                icon.innerText = '●';
-                text.innerText = 'Frozen';
-                stopTimer();
-            } else {
-                btn.classList.remove('active');
-                icon.innerText = '○';
-                text.innerText = 'Live Mode';
-                startTimer();
-            }
+            document.getElementById('btn-icon').innerText = isFrozen ? '●' : '○';
+            document.getElementById('btn-text').innerText = isFrozen ? 'Frozen' : 'Live Mode';
+            isFrozen ? (btn.classList.add('active'), stopTimer()) : (btn.classList.remove('active'), startTimer());
         }
 
-        function handleContainerClick(event) {
-            if (!isFrozen) {
-                timeLeft = REFRESH_RATE;
-                fetchDiscoveryAnime();
-            }
+        function handleNextClick(e) {
+            if(e) e.stopPropagation();
+            timeLeft = REFRESH_RATE; // Reset timer on manual skip
+            fetchDiscoveryAnime();
         }
 
-        function goBack(event) {
-            event.stopPropagation();
+        function goBack(e) {
+            if(e) e.stopPropagation();
             if (!previousAnimeData) return;
             if (!isFrozen) toggleFreeze();
-            const temp = currentAnimeData;
-            currentAnimeData = previousAnimeData;
-            previousAnimeData = temp;
+            [currentAnimeData, previousAnimeData] = [previousAnimeData, currentAnimeData];
             displayAnime(currentAnimeData);
         }
 
@@ -164,16 +152,11 @@
             timerUpdate = setInterval(() => {
                 if (!isFrozen) {
                     timeLeft -= 100;
-                    const progress = ((REFRESH_RATE - timeLeft) / REFRESH_RATE) * 100;
-                    document.getElementById('progress-bar').style.width = progress + '%';
-                    if (timeLeft <= 0) {
-                        timeLeft = REFRESH_RATE;
-                        fetchDiscoveryAnime();
-                    }
+                    document.getElementById('progress-bar').style.width = ((REFRESH_RATE - timeLeft) / REFRESH_RATE) * 100 + '%';
+                    if (timeLeft <= 0) { timeLeft = REFRESH_RATE; fetchDiscoveryAnime(); }
                 }
             }, 100);
         }
-
         function stopTimer() { clearInterval(timerUpdate); }
 
         function getStarRating(score) {
@@ -184,88 +167,40 @@
 
         async function fetchDiscoveryAnime() {
             try {
-                const randomGenreId = PREFERRED_GENRES[Math.floor(Math.random() * PREFERRED_GENRES.length)];
+                const genre = PREFERRED_GENRES[Math.floor(Math.random() * PREFERRED_GENRES.length)];
+                const baseUrl = `https://api.jikan.moe/v4/anime?genres=${genre}&start_date=${START_DATE}&end_date=${END_DATE}&order_by=score`;
+                const init = await (await fetch(`${baseUrl}&limit=1`)).json();
+                const page = Math.floor(Math.random() * Math.min(init.pagination.last_visible_page || 1, 20)) + 1;
+                const res = await (await fetch(`${baseUrl}&page=${page}`)).json();
                 
-                // Construct the URL with Date Range filters
-                // order_by=score ensures the results are sorted by rating rather than popularity (can help find hidden gems)
-                const baseUrl = `https://api.jikan.moe/v4/anime?genres=${randomGenreId}&start_date=${START_DATE}&end_date=${END_DATE}&order_by=score`;
-
-                // 1. Get total pages for this specific date range and genre
-                const initialRes = await fetch(`${baseUrl}&limit=1`);
-                const initialData = await initialRes.json();
-                
-                // Cap at 20 pages to ensure we get higher-quality/more relevant results 
-                // within the modern era (usually the first few hundred shows)
-                const apiTotalPages = initialData.pagination.last_visible_page || 1;
-                const lastPage = Math.min(apiTotalPages, 20);
-                const randomPage = Math.floor(Math.random() * lastPage) + 1;
-
-                // 2. Fetch the random page
-                const response = await fetch(`${baseUrl}&page=${randomPage}`);
-                const result = await response.json();
-                
-                // === ANTI-BLACK SCREEN GUARD ===
-                // If the data is empty, trigger a retry immediately instead of waiting 60s
-                if (!result.data || result.data.length === 0) {
-                    return fetchDiscoveryAnime();
-                }
-
-                const newAnime = result.data[Math.floor(Math.random() * result.data.length)];
+                if (!res.data?.length) return fetchDiscoveryAnime();
+                const newAnime = res.data[Math.floor(Math.random() * res.data.length)];
 
                 if (currentAnimeData) {
                     previousAnimeData = currentAnimeData;
                     document.getElementById('back-btn').style.display = 'flex';
                 }
                 currentAnimeData = newAnime;
-
                 displayAnime(currentAnimeData);
-
-            } catch (error) {
-                console.error("Fetch Error:", error);
-                // If the API fails entirely (rate limit), try again in 5s
-                setTimeout(fetchDiscoveryAnime, 5000);
-            }
+            } catch (e) { setTimeout(fetchDiscoveryAnime, 5000); }
         }
 
-        function displayAnime(anime) {
-            const posterImg = document.getElementById('poster');
-            const bgBlur = document.getElementById('bg-blur');
-            const infoOverlay = document.getElementById('info-overlay');
-
-            posterImg.style.opacity = 0;
-            infoOverlay.style.opacity = 0;
-            
+        function displayAnime(a) {
+            const p = document.getElementById('poster'), b = document.getElementById('bg-blur'), o = document.getElementById('info-overlay');
+            p.style.opacity = o.style.opacity = 0;
             setTimeout(() => {
-                const imageUrl = anime.images.jpg.large_image_url;
-                bgBlur.style.backgroundImage = `url('${imageUrl}')`;
-                posterImg.src = imageUrl;
-                
-                document.getElementById('title').innerText = anime.title_english || anime.title;
-                const stars = getStarRating(anime.score);
-                const scoreNum = anime.score ? `(${anime.score.toFixed(1)})` : '';
-                const year = anime.aired?.prop?.from?.year || '????';
-                const genres = anime.genres.slice(0, 2).map(g => g.name).join(', ');
-                const type = anime.type || 'TV';
-                // Added Episode Count Logic
-                const eps = anime.episodes ? `${anime.episodes} EPS` : '? EPS';
-
-                document.getElementById('meta').innerHTML = `
-                    <span class="stars">${stars}</span> <span class="score-num">${scoreNum}</span> | 
-                    <span class="year-tag">${year}</span> | 
-                    <span class="ep-tag">${eps}</span> | 
-                    ${genres} | ${type}`;
-                
-                document.getElementById('synopsis').innerText = anime.synopsis || "No synopsis available.";
-
-                posterImg.onload = () => {
-                    posterImg.style.opacity = 1;
-                    infoOverlay.style.opacity = 1;
-                };
+                const img = a.images.jpg.large_image_url;
+                b.style.backgroundImage = `url('${img}')`;
+                p.src = img;
+                document.getElementById('title').innerText = a.title_english || a.title;
+                const stars = getStarRating(a.score);
+                document.getElementById('meta').innerHTML = `<span class="stars">${stars}</span> (${a.score?.toFixed(1) || '?'}) | <span class="year-tag">${a.aired?.prop?.from?.year || '????'}</span> | <span class="ep-tag">${a.episodes || '?'} EPS</span> | ${a.genres.slice(0,2).map(g=>g.name).join(', ')} | ${a.type || 'TV'}`;
+                document.getElementById('synopsis').innerText = a.synopsis || "No synopsis available.";
+                p.onload = () => { p.style.opacity = o.style.opacity = 1; };
             }, 1500);
         }
 
-        fetchDiscoveryAnime();
-        startTimer();
+        fetchDiscoveryAnime(); startTimer();
     </script>
 </body>
 </html>
